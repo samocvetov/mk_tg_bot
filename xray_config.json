@@ -1,0 +1,10 @@
+{
+  "inbounds": [{"port": 1080, "protocol": "socks", "settings": {"udp": true}}],
+  "outbounds": [{
+    "protocol": "vless",
+    "settings": {
+      "vnext": [{"address": "твой_ip_сервера", "port": 443, "users": [{"id": "твой_uuid", "encryption": "none"}]}]
+    },
+    "streamSettings": {"network": "ws", "security": "tls"}
+  }]
+}
