@@ -1,16 +1,16 @@
 FROM python:3.10-alpine
 
-# Устанавливаем системные зависимости для работы с сетью
+# Системные зависимости для сборки Scapy
 RUN apk add --no-cache libpcap-dev gcc musl-dev linux-headers
 
-# Копируем бинарник xray, подготовленный на предыдущем шаге
+# Копируем бинарник xray из корня сборки
 COPY xray /usr/bin/xray
 
-# Устанавливаем библиотеки для бота и сниффера
+# Устанавливаем библиотеки Python (без тяжелых pandas/matplotlib)
 RUN pip install --no-cache-dir python-telegram-bot scapy
 
 WORKDIR /app
 COPY main.py .
 
-# Запуск xray в фоне и затем нашего бота
+# Запуск xray в фоне и переход к боту
 CMD ["sh", "-c", "xray -version && python main.py"]
