@@ -3,7 +3,7 @@ on:
   push:
     branches: [ "main" ]
   workflow_dispatch: # Это добавит кнопку ручного запуска
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest # Робот запустится на сервере с Linux
