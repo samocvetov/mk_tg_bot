@@ -7,11 +7,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Download Xray Binary
+- name: Download Xray Binary
         run: |
           wget https://github.com/XTLS/Xray-core/releases/download/v1.8.4/Xray-linux-arm32-v7.zip
-          unzip Xray-linux-arm32-v7.zip xray -d .
-          chmod +x xray
+          unzip -j Xray-linux-arm32-v7.zip xray -d .
+          ls -la # Эта команда покажет список файлов в логах, чтобы мы убедились, что xray на месте
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
