@@ -8,19 +8,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-- name: Download Xray Binary
+      - name: Download Xray Binary
         run: |
-          # Скачиваем ВСЕ ассеты релиза, чтобы не гадать с именами
+          # Скачиваем абсолютно все файлы из релиза v1.8.4
           gh release download v1.8.4 -R XTLS/Xray-core
           
-          # Ищем архив для arm32-v7 (подходит для hAP ac2)
+          # Ищем архив, в названии которого есть arm32-v7 (для hAP ac2)
           ARCHIVE=$(ls | grep -i "arm32-v7" | grep ".zip" | head -n 1)
           echo "Found archive: $ARCHIVE"
           
-          # Распаковываем найденный архив
+          # Распаковываем только сам бинарник xray в корень
           unzip -j "$ARCHIVE" xray -d .
-          
-          # Делаем исполняемым и проверяем
           chmod +x xray
           ls -la xray
         env:
