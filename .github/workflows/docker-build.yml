@@ -10,17 +10,17 @@ jobs:
 
 - name: Download Xray Binary
         run: |
-          # Скачиваем архив для linux-arm32-v7 (подходит для hAP ac2)
-          gh release download v1.8.4 -R XTLS/Xray-core -p "Xray-linux-arm32-v7.zip"
+          # Скачиваем ВСЕ ассеты релиза, чтобы не гадать с именами
+          gh release download v1.8.4 -R XTLS/Xray-core
           
-          # Распаковываем всё во временную папку
-          mkdir -p temp_xray
-          unzip Xray-linux-arm32-v7.zip -d temp_xray
+          # Ищем архив для arm32-v7 (подходит для hAP ac2)
+          ARCHIVE=$(ls | grep -i "arm32-v7" | grep ".zip" | head -n 1)
+          echo "Found archive: $ARCHIVE"
           
-          # Ищем бинарник (он может быть в корне или в папке) и копируем в текущую директорию
-          find temp_xray -name "xray" -type f -exec cp {} . \;
+          # Распаковываем найденный архив
+          unzip -j "$ARCHIVE" xray -d .
           
-          # Делаем исполняемым и проверяем наличие
+          # Делаем исполняемым и проверяем
           chmod +x xray
           ls -la xray
         env:
