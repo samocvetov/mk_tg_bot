@@ -1,0 +1,32 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ "main" ] # Робот сработает только когда ты пушишь в ветку main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Робот запустится на сервере с Linux
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3 # 1. Робот скачивает твой код из репозитория
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2 # 2. Подготовка для сборки под ARM (нужно для MikroTik)
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2 # 3. Улучшенный сборщик Docker
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2 # 4. Логинимся в твой Docker Hub
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }} # Секретная переменная
+          password: ${{ secrets.DOCKERHUB_TOKEN }}    # Секретная переменная
+
+      - name: Build and push
+        uses: docker/build-push-action@v4 # 5. САМ ПРОЦЕСС СБОРКИ
+        with:
+          context: .
+          platforms: linux/arm/v7 # ВАЖНО: Архитектура процессора hAP ac2
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mk_tg_bot:latest # Как будет называться образ
