@@ -8,13 +8,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Download Xray Binary
+- name: Download Xray Binary
         run: |
-          # Используем GitHub CLI для надежного скачивания
+          # Скачиваем архив для linux-arm32-v7 (подходит для hAP ac2)
           gh release download v1.8.4 -R XTLS/Xray-core -p "Xray-linux-arm32-v7.zip"
-          unzip -j Xray-linux-arm32-v7.zip xray -d .
+          
+          # Распаковываем всё во временную папку
+          mkdir -p temp_xray
+          unzip Xray-linux-arm32-v7.zip -d temp_xray
+          
+          # Ищем бинарник (он может быть в корне или в папке) и копируем в текущую директорию
+          find temp_xray -name "xray" -type f -exec cp {} . \;
+          
+          # Делаем исполняемым и проверяем наличие
           chmod +x xray
-          echo "Check if xray exists:"
           ls -la xray
         env:
           GH_TOKEN: ${{ github.token }}
