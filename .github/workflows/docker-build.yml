@@ -1,5 +1,6 @@
 name: Build ARM Image
 on: [push, workflow_dispatch]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -7,14 +8,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-- name: Download Xray Binary
+      - name: Download Xray Binary
         run: |
-          wget https://github.com/XTLS/Xray-core/releases/download/v1.8.4/Xray-linux-arm32-v7.zip
+          # Используем GitHub CLI для надежного скачивания
+          gh release download v1.8.4 -R XTLS/Xray-core -p "Xray-linux-arm32-v7.zip"
           unzip -j Xray-linux-arm32-v7.zip xray -d .
-          ls -la # Эта команда покажет список файлов в логах, чтобы мы убедились, что xray на месте
+          chmod +x xray
+          echo "Check if xray exists:"
+          ls -la xray
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
+      
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       
