@@ -1,8 +1,8 @@
-name: Build and Push Docker Image
-
-on:
+name: Build ARM Image
+on: 
   push:
-    branches: [ "main" ] # Робот сработает только когда ты пушишь в ветку main
+    branches: [ "main" ]
+  workflow_dispatch: # Это добавит кнопку ручного запуска
 
 jobs:
   build:
