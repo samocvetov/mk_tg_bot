@@ -1,28 +1,24 @@
-# --- 1. Сетевая настройка (Bridge Mode) ---
-/interface bridge add name=bridge-lan
-/interface bridge port add bridge=bridge-lan interface=ether1
-/interface bridge port add bridge=bridge-lan interface=wlan1
-/interface bridge port add bridge=bridge-lan interface=wlan2
+# --- 1. Bridge & IP (Прозрачный режим) ---
+/interface bridge add name=BR-LAN
+/interface bridge port add bridge=BR-LAN interface=ether1
+/interface bridge port add bridge=BR-LAN interface=all-wireless
+/ip dhcp-client add interface=BR-LAN disabled=no
 
-/ip dhcp-client add interface=bridge-lan disabled=no
-
-# --- 2. Настройка виртуальной сети для контейнеров ---
-/interface veth add name=veth1 address=172.17.0.2/24 gateway=172.17.0.1
-/interface bridge add name=bridge-containers
-/interface bridge port add bridge=bridge-containers interface=veth1
-/ip address add address=172.17.0.1/24 interface=bridge-containers
-
-# NAT для контейнера, чтобы он видел интернет через основной шлюз
+# --- 2. Контейнерная среда ---
+/interface veth add name=veth-bot address=172.17.0.2/24 gateway=172.17.0.1
+/interface bridge add name=BR-CONT
+/interface bridge port add bridge=BR-CONT interface=veth-bot
+/ip address add address=172.17.0.1/24 interface=BR-CONT
 /ip firewall nat add chain=srcnat src-address=172.17.0.0/24 action=masquerade
 
-# --- 3. Радио-сканер (TZSP Stream) ---
-# Настраиваем wlan1 на прослушку (Monitor Mode) и стриминг в контейнер
-/interface wireless set [ find default-name=wlan1 ] mode=station-dump
+# --- 3. Радио-сканер (Слушаем эфир) ---
+/interface wireless set [find default-name=wlan1] mode=station-bridge disabled=no
 /interface wireless sniffer set streaming-enabled=yes streaming-server=172.17.0.2
 
-# --- 4. Подготовка диска ---
-/container config set ram-high=90M tmpdir=disk1/tmp
+# --- 4. Установка контейнера (Замени на свой Docker Hub image) ---
+/container config set ram-high=95M tmpdir=disk1/tmp
+/container envs add name=bot_envs key=TG_TOKEN value="твой_токен"
+/container envs add name=bot_envs key=ADMIN_ID value="твой_айди"
 
-# --- 5. Загрузка и запуск (пример команды) ---
-# /container add remote-image=python:3.10-alpine interface=veth1 root-dir=disk1/bot \
-# envlist=bot_envs logging=yes
+/container add remote-image=samocvetov/mk_tg_bot:latest interface=veth-bot \
+    root-dir=disk1/bot envlist=bot_envs logging=yes
